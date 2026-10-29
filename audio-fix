@@ -7,7 +7,14 @@
 #
 # Run it from dmenu_run, or with "pick" to choose a card from a dmenu list.
 
-notify() { dunstify -r 9902 -a audio-fix "$@"; }
+# dunstify if installed, else notify-send; older notify-send has no -r (replace id)
+notify() {
+    if command -v dunstify >/dev/null 2>&1; then
+        dunstify -r 9902 -a audio-fix "$@"
+    elif command -v notify-send >/dev/null 2>&1; then
+        notify-send -r 9902 -a audio-fix "$@" 2>/dev/null || notify-send -a audio-fix "$@"
+    fi
+}
 
 sink=$(pactl get-default-sink)
 card=$(pactl list sinks | awk -v s="$sink" '
